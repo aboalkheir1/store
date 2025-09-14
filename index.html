@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iStorage - مخزن الملفات السحابي</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo"><i class="fas fa-apple-alt"></i> iStorage</h1>
+            <p class="subtitle">تخزين آمن لملفاتك.</p>
+        </div>
+
+        <div class="auth-card" id="authSection">
+            <h2><i class="fas fa-lock-open"></i> تسجيل الدخول</h2>
+            <p>للوصول إلى ملفاتك، أدخل كلمة المرور.</p>
+            <input type="password" id="passwordInput" class="input" placeholder="كلمة المرور">
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="authenticateUser()">دخول</button>
+                <button class="btn btn-secondary" onclick="showSetPasswordModal()">تعيين كلمة مرور</button>
+            </div>
+        </div>
+
+        <div id="mainSection" class="hidden">
+            <div class="card storage-info-card">
+                <div class="storage-details">
+                    <div class="info-item">
+                        <i class="fas fa-hdd icon-lg"></i>
+                        <span id="usedSpace" class="value">0 MB</span>
+                        <span class="label">مساحة مستخدمة</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-database icon-lg"></i>
+                        <span id="totalSpace" class="value">250 MB</span>
+                        <span class="label">مساحة كلية</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-file-alt icon-lg"></i>
+                        <span id="fileCount" class="value">0</span>
+                        <span class="label">عدد الملفات</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-crown icon-lg"></i>
+                        <span id="subscriptionType" class="value">عادي</span>
+                        <span id="subscriptionExpiry" class="label"></span>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="storageProgress"></div>
+                </div>
+            </div>
+
+            <div class="card premium-card" id="premiumSection">
+                <h2>ترقية إلى باقة iPro</h2>
+                <p>مساحة غير محدودة ومزايا حصرية.</p>
+                <div class="button-group">
+                    <button class="btn btn-upgrade" onclick="showUpgradeModal()">ترقية الآن</button>
+                    <button class="btn btn-whatsapp" onclick="requestUpgradeCode()">طلب كود</button>
+                </div>
+            </div>
+
+            <div class="card upload-card">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon-wrapper">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    </div>
+                    <p class="upload-text">اسحب الملفات هنا أو انقر للرفع</p>
+                    <p class="upload-description" id="uploadDescription">يدعم الصور وملفات PDF</p>
+                    <input type="file" id="fileInput" class="file-input" multiple accept="image/*,.pdf">
+                </div>
+            </div>
+
+            <div class="files-grid" id="filesGrid">
+                </div>
+
+            <div class="management-buttons">
+                <button class="btn btn-manage" onclick="showChangePasswordModal()">
+                    <i class="fas fa-key"></i> تغيير كلمة المرور
+                </button>
+                <button class="btn btn-manage" onclick="clearAllFiles()">
+                    <i class="fas fa-trash"></i> مسح جميع الملفات
+                </button>
+                <button class="btn btn-manage" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="upgradeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('upgradeModal')">&times;</span>
+            <h2>تفعيل iPro</h2>
+            <p>أدخل كود الترقية:</p>
+            <input type="text" id="upgradeCode" class="input" placeholder="مثال: ABC-123">
+            <button class="btn btn-primary" onclick="validateUpgradeCode()">تفعيل</button>
+        </div>
+    </div>
+
+    <div id="setPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('setPasswordModal')">&times;</span>
+            <h2>تعيين كلمة مرور</h2>
+            <input type="password" id="newPassword" class="input" placeholder="كلمة المرور الجديدة">
+            <input type="password" id="confirmPassword" class="input" placeholder="تأكيد كلمة المرور">
+            <button class="btn btn-primary" onclick="setNewPassword()">حفظ</button>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('changePasswordModal')">&times;</span>
+            <h2>تغيير كلمة المرور</h2>
+            <input type="password" id="currentPassword" class="input" placeholder="كلمة المرور الحالية">
+            <input type="password" id="newPasswordChange" class="input" placeholder="كلمة المرور الجديدة">
+            <input type="password" id="confirmPasswordChange" class="input" placeholder="تأكيد كلمة المرور">
+            <button class="btn btn-primary" onclick="changePassword()">تغيير</button>
+        </div>
+    </div>
+
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('previewModal')">&times;</span>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
